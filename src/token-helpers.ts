@@ -20,5 +20,5 @@ export async function createTokenWithMemoExtension(
   tokenAccountKeypair: Keypair,
   mint: PublicKey,
 ) {
-  throw new Error
+  throw new Error("Change code to continue")
 }
