@@ -1,17 +1,9 @@
 import {
   TOKEN_2022_PROGRAM_ID,
   getAccount,
-  AccountState,
-  thawAccount,
   mintTo,
-  setAuthority,
-  AuthorityType,
   createTransferInstruction,
   createMint,
-  getAccountLen,
-  ExtensionType,
-  createInitializeAccountInstruction,
-  createEnableRequiredMemoTransfersInstruction,
   disableRequiredMemoTransfers,
   enableRequiredMemoTransfers
 } from "@solana/spl-token";
@@ -22,15 +14,10 @@ import {
   Transaction,
   PublicKey,
   TransactionInstruction,
-  SystemProgram,
-  clusterApiUrl,
 } from "@solana/web3.js";
 import { createTokenWithMemoExtension } from "./token-helpers";
 import { initializeKeypair } from "./keypair-helpers";
 require("dotenv").config();
-
-
-
 interface TransferWithoutMemoInputs {
   connection: Connection;
   fromTokenAccount: PublicKey;
