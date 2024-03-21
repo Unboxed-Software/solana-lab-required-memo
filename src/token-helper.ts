@@ -22,30 +22,29 @@ export async function createTokenWithMemoExtension(
 ) {
 
   const accountLen = getAccountLen([ExtensionType.MemoTransfer]);
-  // Minimum lamports required for Token Account
   const lamports = await connection.getMinimumBalanceForRentExemption(accountLen);
 
   const createAccountInstruction = SystemProgram.createAccount({
-    fromPubkey: payer.publicKey, // Account that will transfer lamports to created account
-    newAccountPubkey: tokenAccountKeypair.publicKey, // Address of the account to create
-    space: accountLen, // Amount of bytes to allocate to the created account
-    lamports, // Amount of lamports transferred to created account
-    programId: TOKEN_2022_PROGRAM_ID, // Program assigned as owner of created account
+    fromPubkey: payer.publicKey,
+    newAccountPubkey: tokenAccountKeypair.publicKey,
+    space: accountLen,
+    lamports,
+    programId: TOKEN_2022_PROGRAM_ID,
   });
 
   const initializeAccountInstruction = createInitializeAccountInstruction(
-    tokenAccountKeypair.publicKey, // Token Account Address
-    mint, // Mint Account
-    payer.publicKey, // Token Account Owner
-    TOKEN_2022_PROGRAM_ID, // Token Extension Program ID
+    tokenAccountKeypair.publicKey,
+    mint,
+    payer.publicKey,
+    TOKEN_2022_PROGRAM_ID,
   );
 
   const enableRequiredMemoTransfersInstruction =
     createEnableRequiredMemoTransfersInstruction(
-      tokenAccountKeypair.publicKey, // Token Account address
-      payer.publicKey, // Token Account Owner
-      undefined, // Additional signers
-      TOKEN_2022_PROGRAM_ID, // Token Program ID
+      tokenAccountKeypair.publicKey,
+      payer.publicKey,
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
     );
 
   const transaction = new Transaction().add(

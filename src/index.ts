@@ -5,7 +5,7 @@ import {
   createTransferInstruction,
   createMint,
   disableRequiredMemoTransfers,
-  enableRequiredMemoTransfers
+  enableRequiredMemoTransfers,
 } from "@solana/spl-token";
 import {
   sendAndConfirmTransaction,
@@ -14,9 +14,11 @@ import {
   Transaction,
   PublicKey,
   TransactionInstruction,
+  LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
-import { createTokenWithMemoExtension } from "./token-helpers";
-import { initializeKeypair } from "./keypair-helpers";
+import { createTokenWithMemoExtension } from "./token-helper";
+import { initializeKeypair, makeKeypairs } from '@solana-developers/helpers';
+
 require("dotenv").config();
 interface TransferWithoutMemoInputs {
   connection: Connection;
@@ -60,14 +62,14 @@ interface TransferWithMemoInputs {
   message: string;
 }
 async function testTransferWithMemo(inputs: TransferWithMemoInputs) {
-  const { fromTokenAccount, destinationTokenAccount, mint, payer, connection, amount, message } = inputs;
+  const { fromTokenAccount, destinationTokenAccount, payer, connection, amount, message } = inputs;
   try {
 
     const transaction = new Transaction().add(
       new TransactionInstruction({
         keys: [{ pubkey: payer.publicKey, isSigner: true, isWritable: true }],
-        data: Buffer.from(message, "utf-8"),
-        programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"),
+        data: Buffer.from(message, "utf-8"), // Memo message. In this case it is "Hello, Solana"
+        programId: new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"), // Memo program that validates keys and memo message
       }),
 
       createTransferInstruction(
@@ -153,13 +155,13 @@ async function testTransferWithDisabledMemo(inputs: TransferWithoutMemoInputs) {
 
 (async () => {
   const connection = new Connection("http://127.0.0.1:8899", 'confirmed');
-  const payer = await initializeKeypair(connection);
+  const payer = await initializeKeypair(connection, {
+    airdropAmount: 1 * LAMPORTS_PER_SOL
+  });
   const mintDecimals = 9;
 
-  const ourTokenAccountKeypair = Keypair.generate();
+  const [ourTokenAccountKeypair, otherTokenAccountKeypair] = makeKeypairs(2)
   const ourTokenAccount = ourTokenAccountKeypair.publicKey;
-
-  const otherTokenAccountKeypair = Keypair.generate();
   const otherTokenAccount = otherTokenAccountKeypair.publicKey;
 
   const amountToMint = 1000;
@@ -225,7 +227,6 @@ async function testTransferWithDisabledMemo(inputs: TransferWithoutMemoInputs) {
       amount: amountToTransfer,
       message: "Hello, Solana"
     });
-
   }
 
   {
